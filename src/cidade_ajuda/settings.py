@@ -1,6 +1,7 @@
 import os
 from decouple import config, Csv
 from dj_database_url import parse as db_url
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,6 +34,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'cidade_ajuda.urls'
@@ -91,8 +93,8 @@ USE_TZ = True
 
 LANGUAGE_CODE = config('LANGUAGE_CODE')
 LANGUAGES = (
-    ('en', 'English'),
-    ('pt-br', 'Português'),
+    ('en', _('Ingles')),
+    ('pt-br', _('Português')),
 )
 
 LOCALE_PATH = os.path.join(BASE_DIR, 'locale')
