@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from .managers import UsuarioManager
+from .managers import UsuarioManager, OcorrenciaManager
 
 
 class Usuario(AbstractBaseUser):
@@ -86,6 +86,8 @@ class Ocorrencia(models.Model):
         default=0, verbose_name=_('inexistentes'))
     quantidade_caso_encerrado = models.IntegerField(
         default=0, verbose_name=_('caso encerrado'))
+
+    objects = OcorrenciaManager()
 
     def __str__(self):
         return '{} - ({}, {})'.format(self.tipo.titulo, self.latitude, self.longitude)
