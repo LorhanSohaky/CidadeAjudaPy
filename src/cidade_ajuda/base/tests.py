@@ -1,12 +1,14 @@
 from django.test import TestCase
-from .models import Tipo, Ponto
-import datetime
+from .models import Tipo, Ocorrencia, Usuario
+from datetime import date, timedelta, datetime
 
 
 class TipoTest(TestCase):
 
-    def create_tipo(self, titulo='Alagamento', descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.', duracao=datetime.timedelta(hours=6)):
-        return Tipo.objects.create(titulo=titulo, descricao=descricao, duracao=duracao)
+    def create_tipo(self, titulo='Alagamento',
+                    sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.',
+                    duracao=timedelta(hours=6)):
+        return Tipo.objects.create(titulo=titulo, sugestao_descricao=sugestao_descricao, duracao=duracao)
 
     def test_tipo_creation(self):
         tipo = self.create_tipo()
@@ -15,15 +17,41 @@ class TipoTest(TestCase):
             tipo.__str__(), 'Alagamento - 6:00:00')
 
 
-class PontoTest(TestCase):
+class OcorrenciaTest(TestCase):
+    def setUp(self):
+        self.usuario = Usuario.objects.create(
+            'Lucas', 'Nunes', 'nickname', date(1995, 10, 1), email='test@mail.com', password='password')
+        self.tipo = Tipo.objects.create(
+            titulo='Alagamento',
+            sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.',
+            duracao=timedelta(hours=6))
 
-    def create_ponto(self, latitude=-21.9853045, longitude=-47.8809275):
-        tipo = Tipo.objects.create(
-            titulo='Alagamento', descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.', duracao=datetime.timedelta(hours=6))
-        return Ponto.objects.create(tipo=tipo, latitude=latitude, longitude=longitude)
+    def test_criar_ocorrencias_com_latitudes_invalidas(self):
+        data_hora_criacao = datetime.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        longitude = -47.8809275
 
-    def test_ponto_creation(self):
-        ponto = self.create_ponto()
-        self.assertTrue(isinstance(ponto, Ponto))
-        self.assertEqual(
-            ponto.__str__(), 'Alagamento - (-21.9853045, -47.8809275)')
+        self.assertRaises(ValueError,
+                          Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
+                          transitavel_a_pe, descricao, -91, longitude)
+
+        self.assertRaises(ValueError,
+                          Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
+                          transitavel_a_pe, descricao, 91, longitude)
+
+    def test_criar_ocorrencias_com_longitudes_invalidas(self):
+        data_hora_criacao = datetime.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -21
+
+        self.assertRaises(ValueError,
+                          Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
+                          transitavel_a_pe, descricao, latitude, -181)
+
+        self.assertRaises(ValueError,
+                          Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
+                          transitavel_a_pe, descricao, latitude, 181)
