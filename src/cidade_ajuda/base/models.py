@@ -19,7 +19,7 @@ class Usuario(AbstractBaseUser):
     sobrenome = models.CharField(_('sobrenome'), max_length=200)
     email = models.EmailField(_('endereço de e-mail'), unique=True, error_messages={
         'unique': _("Já existe um usuário com este e-mail."),
-    },)
+    }, )
     esta_ativo = models.BooleanField(
         _('ativo'),
         default=True,
@@ -65,7 +65,8 @@ class Ocorrencia(models.Model):
         validators=[MinValueValidator(-180), MaxValueValidator(180)])
     esta_ativa = models.BooleanField(verbose_name=_('ativa'), default=True)
     data_hora_criacao = models.DateTimeField(
-        verbose_name=_('data e hora de criação'), auto_now_add=True, help_text=_('Momento em que a ocorrência foi registrada'))
+        verbose_name=_('data e hora de criação'), auto_now_add=True,
+        help_text=_('Momento em que a ocorrência foi registrada'))
     prazo_termino = models.DateTimeField(verbose_name=_(
         'prazo'), help_text=_('prazo para término da ocorrência'))
     transitavel_veiculo = models.BooleanField(
