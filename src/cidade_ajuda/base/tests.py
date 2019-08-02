@@ -1,6 +1,7 @@
 from django.test import TestCase
+from django.utils import timezone
 from .models import Tipo, Ocorrencia, Usuario
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 
 
 class UsuarioTest(TestCase):
@@ -57,7 +58,7 @@ class OcorrenciaTest(TestCase):
             duracao=timedelta(hours=6))
 
     def test_criar_ocorrencias_com_latitudes_invalidas(self):
-        data_hora_criacao = datetime.now()
+        data_hora_criacao = timezone.now()
         transitavel_veiculo = True
         transitavel_a_pe = False
         descricao = 'descrição de teste'
@@ -72,7 +73,7 @@ class OcorrenciaTest(TestCase):
                           transitavel_a_pe, descricao, 91, longitude)
 
     def test_criar_ocorrencias_com_longitudes_invalidas(self):
-        data_hora_criacao = datetime.now()
+        data_hora_criacao = timezone.now()
         transitavel_veiculo = True
         transitavel_a_pe = False
         descricao = 'descrição de teste'
@@ -87,7 +88,7 @@ class OcorrenciaTest(TestCase):
                           transitavel_a_pe, descricao, latitude, 181)
 
     def test_criar_ocorrencia(self):
-        data_hora_criacao = datetime.now()
+        data_hora_criacao = timezone.now()
         transitavel_veiculo = True
         transitavel_a_pe = False
         descricao = 'descrição de teste'

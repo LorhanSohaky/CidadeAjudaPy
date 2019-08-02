@@ -1,6 +1,6 @@
 from django.contrib.auth.models import BaseUserManager
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 
 
 class UsuarioManager(BaseUserManager):
@@ -57,7 +57,7 @@ class OcorrenciaManager(models.Manager):
         quantidade_existente = 1
         quantidade_inexistente = 0
         quantidade_caso_encerrado = 0
-        prazo_termino = datetime.now() + tipo.duracao
+        prazo_termino = timezone.now() + tipo.duracao
 
         ocorrencia = self.model(usuario=usuario, tipo=tipo, esta_ativa=esta_ativa, data_hora_criacao=data_hora_criacao,
                                 transitavel_veiculo=transitavel_veiculo,
