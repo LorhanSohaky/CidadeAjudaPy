@@ -26,23 +26,17 @@ class UsuarioTest(TestCase):
     def test_criar_usuario_sem_senha(self):
         self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes', apelido='nickname',
                           data_nascimento=date(1995, 10, 1), email='test@mail.com')
-    
+
     def test_criar_usuario(self):
         usuario = Usuario.objects.create(
             'Lucas', 'Nunes', 'nickname', date(1995, 10, 1), email='test@mail.com', password='password')
-        self.assertEqual(usuario.__str__(),'Lucas Nunes - nickname')
-        
+        self.assertEqual(usuario.__str__(), 'Lucas Nunes - nickname')
 
 
 class TipoTest(TestCase):
-
-    def create_tipo(self, titulo='Alagamento',
-                    sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.',
-                    duracao=timedelta(hours=6)):
-        return Tipo.objects.create(titulo=titulo, sugestao_descricao=sugestao_descricao, duracao=duracao)
-
-    def test_tipo_creation(self):
-        tipo = self.create_tipo()
+    def test_criar_tipo(self):
+        tipo = Tipo.objects.create(
+            self, titulo='Alagamento', sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.', duracao=timedelta(hours=6))
         self.assertTrue(isinstance(tipo, Tipo))
         self.assertEqual(
             tipo.__str__(), 'Alagamento - 6:00:00')
