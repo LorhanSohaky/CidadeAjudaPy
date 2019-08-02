@@ -37,17 +37,6 @@ class Usuario(AbstractBaseUser):
 
     objects = UsuarioManager()
 
-    def clean(self):
-        super().clean()
-        self.email = self.__class__.objects.normalize_email(self.email)
-
-    def get_full_name(self):
-        full_name = '%s %s' % (self.primeiro_nome, self.sobrenome_nome)
-        return full_name.strip()
-
-    def get_short_name(self):
-        return self.primeiro_nome
-
 
 class Tipo(models.Model):
     titulo = models.CharField(max_length=50, verbose_name=_('título'))
