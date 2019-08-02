@@ -11,26 +11,39 @@ class UsuarioTest(TestCase):
         self.assertEqual(usuario.__str__(), 'Lucas Nunes - nickname')
 
     def test_criar_usuario_sem_email(self):
-        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes',
+        with self.assertRaises(ValueError) as error:
+            Usuario.objects.create( primeiro_nome='Lucas', sobrenome='Nunes',
                           apelido='nickname', data_nascimento=date(1995, 10, 1), password='password')
+        self.assertEqual('Usuario must have an email address',str(error.exception))
 
     def test_criar_usuario_sem_nome_ou_sobrenome(self):
-        self.assertRaises(ValueError, Usuario.objects.create, sobrenome='Nunes', apelido='nickname', data_nascimento=date(
+        with self.assertRaises(ValueError) as error:
+            Usuario.objects.create( sobrenome='Nunes', apelido='nickname', data_nascimento=date(
             1995, 10, 1), email='test@mail.com', password='password')
-        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', apelido='nickname',
+        self.assertEqual('Usuario must have a name',str(error.exception))
+
+        with self.assertRaises(ValueError) as error:
+            Usuario.objects.create(primeiro_nome='Lucas', apelido='nickname',
                           data_nascimento=date(1995, 10, 1), email='test@mail.com', password='password')
+        self.assertEqual('Usuario must have a name',str(error.exception))
 
     def test_criar_usuario_sem_apelido(self):
-        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes',
+        with self.assertRaises(ValueError) as error:
+            Usuario.objects.create(primeiro_nome='Lucas', sobrenome='Nunes',
                           data_nascimento=date(1995, 10, 1), email='test@mail.com', password='password')
+        self.assertEqual('Usuario must have a nickname',str(error.exception))
 
     def test_criar_usuario_sem_data_de_nascimento(self):
-        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas',
+        with self.assertRaises(ValueError) as error:
+            Usuario.objects.create(primeiro_nome='Lucas',
                           sobrenome='Nunes', apelido='nickname', email='test@mail.com', password='password')
+        self.assertEqual('Usuario must have a date of birth',str(error.exception))
 
     def test_criar_usuario_sem_senha(self):
-        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes', apelido='nickname',
+        with self.assertRaises(ValueError) as error:
+            Usuario.objects.create(primeiro_nome='Lucas', sobrenome='Nunes', apelido='nickname',
                           data_nascimento=date(1995, 10, 1), email='test@mail.com')
+        self.assertEqual('Usuario must have a password',str(error.exception))
 
 
 class TipoTest(TestCase):
@@ -71,13 +84,15 @@ class OcorrenciaTest(TestCase):
         descricao = 'descrição de teste'
         longitude = -47.8809275
 
-        self.assertRaises(ValueError,
-                          Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
+        with self.assertRaises(ValueError) as error:
+            Ocorrencia.objects.create( self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
                           transitavel_a_pe, descricao, -91, longitude)
+        self.assertEqual('Latitude invalida',str(error.exception))
 
-        self.assertRaises(ValueError,
-                          Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
+        with self.assertRaises(ValueError) as error:
+            Ocorrencia.objects.create(self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
                           transitavel_a_pe, descricao, 91, longitude)
+        self.assertEqual('Latitude invalida',str(error.exception))
 
     def test_criar_ocorrencias_com_longitudes_invalidas(self):
         data_hora_criacao = timezone.now()
@@ -86,13 +101,15 @@ class OcorrenciaTest(TestCase):
         descricao = 'descrição de teste'
         latitude = -21
 
-        self.assertRaises(ValueError,
-                          Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
+        with self.assertRaises(ValueError) as error:
+            Ocorrencia.objects.create( self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
                           transitavel_a_pe, descricao, latitude, -181)
+        self.assertEqual('Longitude invalida',str(error.exception))
 
-        self.assertRaises(ValueError,
-                          Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
+        with self.assertRaises(ValueError) as error:
+            Ocorrencia.objects.create(self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
                           transitavel_a_pe, descricao, latitude, 181)
+        self.assertEqual('Longitude invalida',str(error.exception))
 
     def test_criar_ocorrencia_sem_usuario(self):
         data_hora_criacao = timezone.now()
@@ -102,8 +119,10 @@ class OcorrenciaTest(TestCase):
         latitude = -30
         longitude = -30
 
-        self.assertRaises(ValueError, Ocorrencia.objects.create, tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
+        with self.assertRaises(ValueError) as error:
+            Ocorrencia.objects.create(tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
                           transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
+        self.assertEqual('Ocorrencia precisa ter um Usuario',str(error.exception))
 
     def test_criar_ocorrencia_sem_tipo(self):
         data_hora_criacao = timezone.now()
