@@ -3,6 +3,30 @@ from .models import Tipo, Ocorrencia, Usuario
 from datetime import date, timedelta, datetime
 
 
+class UsuarioTest(TestCase):
+    def test_criar_usuario_sem_email(self):
+        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes',
+                          apelido='nickname', data_nascimento=date(1995, 10, 1), password='password')
+
+    def test_criar_usuario_sem_nome_ou_sobrenome(self):
+        self.assertRaises(ValueError, Usuario.objects.create, sobrenome='Nunes', apelido='nickname', data_nascimento=date(
+            1995, 10, 1), email='test@mail.com', password='password')
+        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', apelido='nickname',
+                          data_nascimento=date(1995, 10, 1), email='test@mail.com', password='password')
+
+    def test_criar_usuario_sem_apelido(self):
+        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes',
+                          data_nascimento=date(1995, 10, 1), email='test@mail.com', password='password')
+
+    def test_criar_usuario_sem_data_de_nascimento(self):
+        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas',
+                          sobrenome='Nunes', apelido='nickname', email='test@mail.com', password='password')
+
+    def test_criar_usuario_sem_senha(self):
+        self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes', apelido='nickname',
+                          data_nascimento=date(1995, 10, 1), email='test@mail.com')
+
+
 class TipoTest(TestCase):
 
     def create_tipo(self, titulo='Alagamento',
