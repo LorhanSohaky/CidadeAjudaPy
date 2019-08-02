@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tipo, Usuario, Ocorrencia, Interacao, ImagemOcorrencia
+from .models import Tipo, Usuario
 
 
 @admin.register(Tipo)
