@@ -36,7 +36,7 @@ class UsuarioTest(TestCase):
 class TipoTest(TestCase):
     def test_criar_tipo(self):
         tipo = Tipo.objects.create(
-            self, titulo='Alagamento', sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.', duracao=timedelta(hours=6))
+            titulo='Alagamento', sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.', duracao=timedelta(hours=6))
         self.assertTrue(isinstance(tipo, Tipo))
         self.assertEqual(
             tipo.__str__(), 'Alagamento - 6:00:00')
