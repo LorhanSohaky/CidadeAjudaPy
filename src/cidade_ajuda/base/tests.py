@@ -104,3 +104,63 @@ class OcorrenciaTest(TestCase):
 
         self.assertRaises(ValueError, Ocorrencia.objects.create, tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
                           transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
+
+    def test_criar_ocorrencia_sem_tipo(self):
+        data_hora_criacao = timezone.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+
+        with self.assertRaises(ValueError) as error:
+            ocorrencia = Ocorrencia.objects.create(
+                usuario=self.usuario, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
+                transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
+        self.assertEqual('Ocorrencia precisa ter um Tipo',
+                         str(error.exception))
+
+    def test_criar_ocorrencia_sem_data_hora_criacao(self):
+        data_hora_criacao = timezone.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+
+        with self.assertRaises(ValueError) as error:
+            ocorrencia = Ocorrencia.objects.create(
+                usuario=self.usuario, tipo=self.tipo, transitavel_veiculo=transitavel_veiculo,
+                transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
+        self.assertEqual(
+            'Ocorrencia precisa ter uma data e hora de criacao', str(error.exception))
+
+    def test_criar_ocorrencia_sem_latitude(self):
+        data_hora_criacao = timezone.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+
+        with self.assertRaises(ValueError) as error:
+            ocorrencia = Ocorrencia.objects.create(
+                usuario=self.usuario, tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
+                transitavel_a_pe=transitavel_a_pe, descricao=descricao, longitude=longitude)
+        self.assertEqual('Ocorrencia precisa ter uma latitude',
+                         str(error.exception))
+
+    def test_criar_ocorrencia_sem_longitude(self):
+        data_hora_criacao = timezone.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+
+        with self.assertRaises(ValueError) as error:
+            ocorrencia = Ocorrencia.objects.create(
+                usuario=self.usuario, tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
+                transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude)
+        self.assertEqual('Ocorrencia precisa ter uma longitude',
+                         str(error.exception))
