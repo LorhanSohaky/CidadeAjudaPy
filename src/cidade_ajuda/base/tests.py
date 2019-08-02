@@ -92,3 +92,14 @@ class OcorrenciaTest(TestCase):
         self.assertRaises(ValueError,
                           Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
                           transitavel_a_pe, descricao, latitude, 181)
+
+    def test_criar_ocorrencia_sem_usuario(self):
+        data_hora_criacao = timezone.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+
+        self.assertRaises(ValueError,Ocorrencia.objects.create, tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
+                          transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
