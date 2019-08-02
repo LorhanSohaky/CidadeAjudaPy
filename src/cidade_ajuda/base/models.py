@@ -38,7 +38,7 @@ class Usuario(AbstractBaseUser):
     objects = UsuarioManager()
 
     def __str__(self):
-        return '{} {} - {}'.format(self.primeiro_nome,self.sobrenome, self.apelido)
+        return '{} {} - {}'.format(self.primeiro_nome, self.sobrenome, self.apelido)
 
 
 class Tipo(models.Model):
