@@ -5,6 +5,11 @@ from datetime import date, timedelta
 
 
 class UsuarioTest(TestCase):
+    def test_criar_usuario(self):
+        usuario = Usuario.objects.create(
+            'Lucas', 'Nunes', 'nickname', date(1995, 10, 1), email='test@mail.com', password='password')
+        self.assertEqual(usuario.__str__(), 'Lucas Nunes - nickname')
+
     def test_criar_usuario_sem_email(self):
         self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes',
                           apelido='nickname', data_nascimento=date(1995, 10, 1), password='password')
@@ -27,11 +32,6 @@ class UsuarioTest(TestCase):
         self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes', apelido='nickname',
                           data_nascimento=date(1995, 10, 1), email='test@mail.com')
 
-    def test_criar_usuario(self):
-        usuario = Usuario.objects.create(
-            'Lucas', 'Nunes', 'nickname', date(1995, 10, 1), email='test@mail.com', password='password')
-        self.assertEqual(usuario.__str__(), 'Lucas Nunes - nickname')
-
 
 class TipoTest(TestCase):
     def test_criar_tipo(self):
@@ -50,6 +50,18 @@ class OcorrenciaTest(TestCase):
             titulo='Alagamento',
             sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.',
             duracao=timedelta(hours=6))
+
+    def test_criar_ocorrencia(self):
+        data_hora_criacao = timezone.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+
+        ocorrencia = Ocorrencia.objects.create(
+            self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo, transitavel_a_pe, descricao, latitude, longitude)
+        self.assertEqual(ocorrencia.__str__(), 'Alagamento - (-30, -30)')
 
     def test_criar_ocorrencias_com_latitudes_invalidas(self):
         data_hora_criacao = timezone.now()
@@ -80,15 +92,3 @@ class OcorrenciaTest(TestCase):
         self.assertRaises(ValueError,
                           Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
                           transitavel_a_pe, descricao, latitude, 181)
-
-    def test_criar_ocorrencia(self):
-        data_hora_criacao = timezone.now()
-        transitavel_veiculo = True
-        transitavel_a_pe = False
-        descricao = 'descrição de teste'
-        latitude = -30
-        longitude = -30
-
-        ocorrencia = Ocorrencia.objects.create(
-            self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo, transitavel_a_pe, descricao, latitude, longitude)
-        self.assertEqual(ocorrencia.__str__(), 'Alagamento - (-30, -30)')
