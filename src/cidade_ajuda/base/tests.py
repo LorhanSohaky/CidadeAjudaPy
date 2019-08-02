@@ -60,7 +60,8 @@ class OcorrenciaTest(TestCase):
         longitude = -30
 
         ocorrencia = Ocorrencia.objects.create(
-            self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo, transitavel_a_pe, descricao, latitude, longitude)
+            usuario=self.usuario, tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
+            transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
         self.assertEqual(ocorrencia.__str__(), 'Alagamento - (-30, -30)')
 
     def test_criar_ocorrencias_com_latitudes_invalidas(self):
@@ -101,5 +102,5 @@ class OcorrenciaTest(TestCase):
         latitude = -30
         longitude = -30
 
-        self.assertRaises(ValueError,Ocorrencia.objects.create, tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
+        self.assertRaises(ValueError, Ocorrencia.objects.create, tipo=self.tipo, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
                           transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
