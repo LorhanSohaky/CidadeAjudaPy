@@ -25,6 +25,12 @@ class UsuarioTest(TestCase):
     def test_criar_usuario_sem_senha(self):
         self.assertRaises(ValueError, Usuario.objects.create, primeiro_nome='Lucas', sobrenome='Nunes', apelido='nickname',
                           data_nascimento=date(1995, 10, 1), email='test@mail.com')
+    
+    def test_criar_usuario(self):
+        usuario = Usuario.objects.create(
+            'Lucas', 'Nunes', 'nickname', date(1995, 10, 1), email='test@mail.com', password='password')
+        self.assertEqual(usuario.__str__(),'Lucas Nunes - nickname')
+        
 
 
 class TipoTest(TestCase):
@@ -79,3 +85,15 @@ class OcorrenciaTest(TestCase):
         self.assertRaises(ValueError,
                           Ocorrencia.objects.create, self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo,
                           transitavel_a_pe, descricao, latitude, 181)
+
+    def test_criar_ocorrencia(self):
+        data_hora_criacao = datetime.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+
+        ocorrencia = Ocorrencia.objects.create(
+            self.usuario, self.tipo, data_hora_criacao, transitavel_veiculo, transitavel_a_pe, descricao, latitude, longitude)
+        self.assertEqual(ocorrencia.__str__(), 'Alagamento - (-30, -30)')
