@@ -1,4 +1,5 @@
 import os
+
 from decouple import config, Csv
 from dj_database_url import parse as db_url
 from django.utils.translation import gettext_lazy as _
@@ -12,6 +13,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+
+AUTH_USER_MODEL = 'auth.User'
 
 # Application definition
 
