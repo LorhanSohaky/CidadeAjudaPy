@@ -72,13 +72,13 @@ class Ocorrencia(models.Model):
     transitavel_veiculo = models.BooleanField(
         verbose_name=_('transitável por veículo'))
     transitavel_a_pe = models.BooleanField(verbose_name=_('transitável a pé'))
-    descricao = models.TextField(verbose_name=_('descrição'))
+    descricao = models.TextField(verbose_name=_('descrição'), blank=True)
     quantidade_existente = models.IntegerField(
-        default=1, verbose_name=_('existentes'))
+        default=1, verbose_name=_('existentes'), validators=[MinValueValidator(0)])
     quantidade_inexistente = models.IntegerField(
-        default=0, verbose_name=_('inexistentes'))
+        default=0, verbose_name=_('inexistentes'), validators=[MinValueValidator(0)])
     quantidade_caso_encerrado = models.IntegerField(
-        default=0, verbose_name=_('caso encerrado'))
+        default=0, verbose_name=_('caso encerrado'), validators=[MinValueValidator(0)])
 
     objects = OcorrenciaManager()
 
