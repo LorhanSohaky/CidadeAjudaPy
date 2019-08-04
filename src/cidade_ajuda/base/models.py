@@ -1,44 +1,23 @@
-from django.db import models
-from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.validators import UnicodeUsernameValidator
-from .managers import UsuarioManager, OcorrenciaManager
+
+from cidade_ajuda import settings
+from .managers import OcorrenciaManager, UsuarioManager
 
 
-class Usuario(AbstractBaseUser):
-    apelido = models.CharField(
-        _('apelido'),
-        max_length=150,
-        help_text=_(
-            'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[UnicodeUsernameValidator()],
-    )
-    primeiro_nome = models.CharField(_('primeiro nome'), max_length=50)
-    sobrenome = models.CharField(_('sobrenome'), max_length=200)
-    email = models.EmailField(_('endereço de e-mail'), unique=True, error_messages={
-        'unique': _("Já existe um usuário com este e-mail."),
-    }, )
-    esta_ativo = models.BooleanField(
-        _('ativo'),
-        default=True,
-    )
-    date_de_criacao = models.DateTimeField(
-        _('data de criação da conta'), default=timezone.now)
+class Usuario(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     data_nascimento = models.DateField(verbose_name=_('data de nascimento'))
-    quantidade_respostas = models.IntegerField(verbose_name=_(
-        'quantidade de respostas'), validators=[MinValueValidator(0)], default=0)
-    quantidade_respostas_confiaveis = models.IntegerField(verbose_name=_(
-        'quantidade de respostas confiáveis'), validators=[MinValueValidator(0)], default=0)
-
-    EMAIL_FIELD = 'email'
-    USERNAME_FIELD = 'apelido'
+    quantidade_respostas = models.IntegerField(verbose_name=_('quantidade de respostas'),
+                                               validators=[MinValueValidator(0)], default=0)
+    quantidade_respostas_confiaveis = models.IntegerField(verbose_name=_('quantidade de respostas confiáveis'),
+                                                          validators=[MinValueValidator(0)], default=0)
 
     objects = UsuarioManager()
 
     def __str__(self):
-        return '{} {} - {}'.format(self.primeiro_nome, self.sobrenome, self.apelido)
+        return '{} {} - {}'.format(self.user.first_name, self.user.last_name, self.user.username)
 
 
 class Tipo(models.Model):

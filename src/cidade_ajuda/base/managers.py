@@ -1,9 +1,9 @@
-from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
 
-class UsuarioManager(BaseUserManager):
+class UsuarioManager(models.Manager):
     use_in_migrations = True
 
     def create(self, primeiro_nome=None, sobrenome=None, apelido=None, data_nascimento=None, email=None, password=None):
@@ -18,20 +18,14 @@ class UsuarioManager(BaseUserManager):
         if not data_nascimento:
             raise ValueError('Usuario must have a date of birth')
 
-        email = self.normalize_email(email)
-        apelido = self.model.normalize_username(apelido)
+        user = User.objects.create(first_name=primeiro_nome, last_name=sobrenome, email=email, username=apelido,
+                                   password=password,
+                                   is_staff=False, is_active=True)
 
-        quantidade_respostas = 0
-        quantidade_respostas_confiaveis = 0
-        esta_ativo = True
-
-        user = self.model(primeiro_nome=primeiro_nome, sobrenome=sobrenome, data_nascimento=data_nascimento,
-                          apelido=apelido, email=email,
-                          quantidade_respostas=quantidade_respostas,
-                          quantidade_respostas_confiaveis=quantidade_respostas_confiaveis, esta_ativo=esta_ativo)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
+        usuario = self.model(user=user, data_nascimento=data_nascimento, quantidade_respostas=0,
+                             quantidade_respostas_confiaveis=0)
+        usuario.save(using=self._db)
+        return usuario
 
 
 class OcorrenciaManager(models.Manager):

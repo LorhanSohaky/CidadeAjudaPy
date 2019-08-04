@@ -1,7 +1,9 @@
+from datetime import date, timedelta
+
 from django.test import TestCase
 from django.utils import timezone
-from .models import Tipo, Ocorrencia, Usuario
-from datetime import date, timedelta
+
+from cidade_ajuda.base.models import Usuario, Tipo, Ocorrencia
 
 
 class UsuarioTest(TestCase):
@@ -60,7 +62,9 @@ class TipoTest(TestCase):
 class OcorrenciaTest(TestCase):
     def setUp(self):
         self.usuario = Usuario.objects.create(
-            'Lucas', 'Nunes', 'nickname', date(1995, 10, 1), email='test@mail.com', password='password')
+            primeiro_nome='Lucas', sobrenome='Nunes', apelido='nickname', data_nascimento=date(1995, 10, 1),
+            email='test@mail.com', password='password')
+
         self.tipo = Tipo.objects.create(
             titulo='Alagamento',
             sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.',
@@ -138,14 +142,13 @@ class OcorrenciaTest(TestCase):
         longitude = -30
 
         with self.assertRaises(ValueError) as error:
-            ocorrencia = Ocorrencia.objects.create(
+            Ocorrencia.objects.create(
                 usuario=self.usuario, data_hora_criacao=data_hora_criacao, transitavel_veiculo=transitavel_veiculo,
                 transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
         self.assertEqual('Ocorrencia precisa ter um Tipo',
                          str(error.exception))
 
     def test_criar_ocorrencia_sem_data_hora_criacao(self):
-        data_hora_criacao = timezone.now()
         transitavel_veiculo = True
         transitavel_a_pe = False
         descricao = 'descrição de teste'
@@ -153,7 +156,7 @@ class OcorrenciaTest(TestCase):
         longitude = -30
 
         with self.assertRaises(ValueError) as error:
-            ocorrencia = Ocorrencia.objects.create(
+            Ocorrencia.objects.create(
                 usuario=self.usuario, tipo=self.tipo, transitavel_veiculo=transitavel_veiculo,
                 transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude, longitude=longitude)
         self.assertEqual(
@@ -164,11 +167,10 @@ class OcorrenciaTest(TestCase):
         transitavel_veiculo = True
         transitavel_a_pe = False
         descricao = 'descrição de teste'
-        latitude = -30
         longitude = -30
 
         with self.assertRaises(ValueError) as error:
-            ocorrencia = Ocorrencia.objects.create(
+            Ocorrencia.objects.create(
                 usuario=self.usuario, tipo=self.tipo, data_hora_criacao=data_hora_criacao,
                 transitavel_veiculo=transitavel_veiculo,
                 transitavel_a_pe=transitavel_a_pe, descricao=descricao, longitude=longitude)
@@ -181,10 +183,9 @@ class OcorrenciaTest(TestCase):
         transitavel_a_pe = False
         descricao = 'descrição de teste'
         latitude = -30
-        longitude = -30
 
         with self.assertRaises(ValueError) as error:
-            ocorrencia = Ocorrencia.objects.create(
+            Ocorrencia.objects.create(
                 usuario=self.usuario, tipo=self.tipo, data_hora_criacao=data_hora_criacao,
                 transitavel_veiculo=transitavel_veiculo,
                 transitavel_a_pe=transitavel_a_pe, descricao=descricao, latitude=latitude)
