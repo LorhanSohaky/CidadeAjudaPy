@@ -41,15 +41,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many=False)
+    primeiro_nome = serializers.CharField(source='user.first_name')
+    sobrenome = serializers.CharField(source='user.last_name')
+    apelido = serializers.CharField(source='user.username')
+    email = serializers.EmailField(source='user.email')
+    password = serializers.CharField(source='user.password', write_only=True)
 
     class Meta:
         model = Usuario
-        ordering = '-id'
-        fields = '__all__'
+        ordering = ['-id']
+        fields = ['id', 'primeiro_nome', 'sobrenome', 'apelido', 'email', 'password', 'data_nascimento', ]
 
     def create(self, validated_data):
-        print(validated_data['user']['first_name'])
         return Usuario.objects.create(primeiro_nome=validated_data['user']['first_name'],
                                       sobrenome=validated_data['user']['last_name'],
                                       apelido=validated_data['user']['username'],
