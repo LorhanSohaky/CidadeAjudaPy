@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -5,6 +7,8 @@ from django.utils import timezone
 
 class UsuarioManager(models.Manager):
     use_in_migrations = True
+
+    IDADE_MINIMA = 18
 
     def create(self, primeiro_nome=None, sobrenome=None, apelido=None, data_nascimento=None, email=None, password=None):
         if not email:
@@ -17,6 +21,13 @@ class UsuarioManager(models.Manager):
             raise ValueError('Usuario must have a nickname')
         if not data_nascimento:
             raise ValueError('Usuario must have a date of birth')
+
+        today = date.today()
+        idade = today.year - data_nascimento.year - ((today.month, today.day) <
+                                                     (data_nascimento.month, data_nascimento.day))
+
+        if not idade > self.IDADE_MINIMA:
+            raise ValueError('User must be at least {} years old'.format(self.IDADE_MINIMA))
 
         user = User.objects.create(first_name=primeiro_nome, last_name=sobrenome, email=email, username=apelido,
                                    password=password,
