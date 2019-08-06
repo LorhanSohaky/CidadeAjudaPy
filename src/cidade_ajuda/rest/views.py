@@ -13,6 +13,9 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
 
+    def get_queryset(self):
+        return Usuario.objects.order_by('id')
+
 
 class OcorrenciaViewSet(viewsets.ModelViewSet):
     queryset = Ocorrencia.objects.all()
