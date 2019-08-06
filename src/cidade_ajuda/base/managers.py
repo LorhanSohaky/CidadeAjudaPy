@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -30,7 +31,7 @@ class UsuarioManager(models.Manager):
             raise ValueError('User must be at least {} years old'.format(self.IDADE_MINIMA))
 
         user = User.objects.create(first_name=primeiro_nome, last_name=sobrenome, email=email, username=apelido,
-                                   password=password,
+                                   password=make_password(password),
                                    is_staff=False, is_active=True)
 
         usuario = self.model(user=user, data_nascimento=data_nascimento, quantidade_respostas=0,
