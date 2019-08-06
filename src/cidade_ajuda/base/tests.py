@@ -49,7 +49,7 @@ class UsuarioTest(TestCase):
 
     def test_criar_usuario_sem_idade_minima(self):
         with self.assertRaises(ValueError) as error:
-            usuario = Usuario.objects.create(
+            Usuario.objects.create(
                 'Antônio', 'Nunes', 'nickname', date(2001, 10, 1), email='test@mail.com', password='password')
 
         self.assertEqual(str(error.exception), 'User must be at least 18 years old')
