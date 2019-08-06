@@ -3,12 +3,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from cidade_ajuda import settings
+from cidade_ajuda.base.validators import MinAgeValidator
 from .managers import OcorrenciaManager, UsuarioManager
 
 
 class Usuario(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    data_nascimento = models.DateField(verbose_name=_('data de nascimento'))
+    data_nascimento = models.DateField(verbose_name=_('data de nascimento'), validators=[MinAgeValidator(18)])
     quantidade_respostas = models.IntegerField(verbose_name=_('quantidade de respostas'),
                                                validators=[MinValueValidator(0)], default=0)
     quantidade_respostas_confiaveis = models.IntegerField(verbose_name=_('quantidade de respostas confiáveis'),
