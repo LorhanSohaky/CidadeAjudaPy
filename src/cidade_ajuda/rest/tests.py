@@ -146,7 +146,7 @@ class UsuarioTest(APITestCase):
 
         request = self.client.patch('/api/usuarios/2/', data, format='json')
 
-        self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class OcorrenciaTest(APITestCase):
