@@ -59,3 +59,17 @@ class UsuarioSerializer(serializers.ModelSerializer):
                                       data_nascimento=validated_data['data_nascimento'],
                                       email=validated_data['user']['email'],
                                       password=validated_data['user']['password'])
+
+    def update(self, instance, validated_data):
+        user = validated_data.get('user')
+
+        if user:
+            instance.user.first_name = user.get('first_name', instance.user.first_name)
+            instance.user.last_name = user.get('last_name', instance.user.last_name)
+            instance.user.username = user.get('username', instance.user.username)
+            instance.user.email = user.get('email', instance.user.email)
+
+        instance.data_nascimento = validated_data.get('data_nascimento', instance.data_nascimento)
+
+        instance.save()
+        return instance

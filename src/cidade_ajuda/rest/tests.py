@@ -15,6 +15,8 @@ class UsuarioTest(APITestCase):
         Usuario.objects.create(
             'Pedro', 'Lucas', 'nickname2', date(1975, 1, 27), email='email@mail.com', password='password')
 
+        self.client.login(username='nickname', password='password')
+
     def test_listar_usuarios(self):
         response_data = {
             'count': 2,
@@ -123,3 +125,23 @@ class UsuarioTest(APITestCase):
         request = self.client.post('/api/usuarios/', data, format='json')
         self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertJSONEqual(request.content, expected_data)
+
+    def test_atualizar_dados_do_proprio_usuario(self):
+        expected_data = {'id': 1, 'primeiro_nome': 'Marco', 'sobrenome': 'Pereira', 'apelido': 'novo',
+                         'email': 'novo@mail.com', 'data_nascimento': '1993-11-01'}
+
+        data = {'primeiro_nome': 'Marco', 'sobrenome': 'Pereira', 'apelido': 'novo', 'email': 'novo@mail.com',
+                'data_nascimento': '1993-11-01'}
+
+        request = self.client.patch('/api/usuarios/1/', data, format='json')
+
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(request.content, expected_data)
+
+    def test_atualizar_dados_de_outro_usuario(self):
+        data = {'primeiro_nome': 'Marco', 'sobrenome': 'Pereira', 'apelido': 'novo', 'email': 'novo@mail.com',
+                'data_nascimento': '1993-11-01'}
+
+        request = self.client.patch('/api/usuarios/2/', data, format='json')
+
+        self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
