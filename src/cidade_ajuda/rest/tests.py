@@ -1,7 +1,6 @@
 import json
 from datetime import date, timedelta
 
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
@@ -19,39 +18,11 @@ class UsuarioTest(APITestCase):
 
         self.client.login(username='nickname', password='password')
 
-    def test_listar_usuarios(self):
-        response_data = {
-            'count': 2,
-            'next': None,
-            'previous': None,
-            'results': [
-                {
-                    'id': 1,
-                    'primeiro_nome': 'Lucas',
-                    'sobrenome': 'Nunes',
-                    'apelido': 'nickname',
-                    'email': 'test@mail.com',
-                    'data_nascimento': '1995-10-01'
-                },
-                {
-                    'id': 2,
-                    'primeiro_nome': 'Pedro',
-                    'sobrenome': 'Lucas',
-                    'apelido': 'nickname2',
-                    'email': 'email@mail.com',
-                    'data_nascimento': '1975-01-27'
-                }]
-        }
-        request = self.client.get('/api/usuarios/')
-
-        self.assertEqual(request.status_code, status.HTTP_200_OK)
-        self.assertJSONEqual(request.content, response_data)
-
-    def test_criar_usuario(self):
+    def test_criar_usuario_sem_estar_logado(self):
         data = {'primeiro_nome': 'Marco', 'sobrenome': 'Buarque', 'apelido': 'nickname3', 'email': 'test@mail.com',
                 'password': 'password',
                 'data_nascimento': '1995-11-01'}
-        request = self.client.post('/api/usuarios/', data, format='json')
+        request = APIClient().post('/api/usuarios/', data, format='json')
 
         self.assertEqual(request.status_code, status.HTTP_201_CREATED)
 
@@ -159,19 +130,18 @@ class OcorrenciaTest(APITestCase):
 
         self.tipo = Tipo.objects.create(
             titulo='Alagamento',
-            sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.',
+            sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há '
+                               'risco de contágio de doenças, entre outras informações.',
             duracao=timedelta(hours=6))
 
         self.client.login(username='nirvana', password='password')
 
     def test_criar_ocorrencia(self):
-        data_hora_criacao = timezone.now()
         transitavel_veiculo = True
         transitavel_a_pe = False
         descricao = 'descrição de teste'
         latitude = -30
         longitude = -30
-        prazo = data_hora_criacao + self.tipo.duracao
 
         data = {'tipo': self.tipo.id, 'transitavel_veiculo': transitavel_veiculo,
                 'transitavel_a_pe': transitavel_a_pe, 'descricao': descricao, 'latitude': latitude,

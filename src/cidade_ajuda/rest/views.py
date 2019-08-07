@@ -1,7 +1,6 @@
 from django.http import JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario
 from cidade_ajuda.rest.serializers import TipoSerializer, OcorrenciaSerializer, UsuarioSerializer
@@ -17,10 +16,15 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     serializer_class = UsuarioSerializer
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [IsAuthenticated]
+        print(self.request.user)
+        if self.action in ['create', ]:
+            permission_classes = [permissions.AllowAny]
+        elif self.action in ['update', 'partial_update', 'destroy', ]:
+            permission_classes = [permissions.IsAuthenticated]
+        elif self.action in ['list', ]:
+            permission_classes = [permissions.IsAdminUser]
         else:
-            permission_classes = [AllowAny]
+            permission_classes = [permissions.IsAdminUser]
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
@@ -41,12 +45,7 @@ class OcorrenciaViewSet(viewsets.ModelViewSet):
     queryset = Ocorrencia.objects.all()
     serializer_class = OcorrenciaSerializer
 
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         try:
