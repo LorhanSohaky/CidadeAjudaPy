@@ -1,9 +1,11 @@
-from datetime import date
+import json
+from datetime import date, timedelta
 
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from cidade_ajuda.base.models import Usuario
+from cidade_ajuda.base.models import Usuario, Tipo
 
 
 class UsuarioTest(APITestCase):
@@ -145,3 +147,50 @@ class UsuarioTest(APITestCase):
         request = self.client.patch('/api/usuarios/2/', data, format='json')
 
         self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class OcorrenciaTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.usuario = Usuario.objects.create(
+            primeiro_nome='Vitoria', sobrenome='Vasconcelos', apelido='nirvana', data_nascimento=date(1995, 6, 15),
+            email='vitoria@mail.com', password='password')
+
+        self.tipo = Tipo.objects.create(
+            titulo='Alagamento',
+            sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há risco de contágio de doenças, entre outras informações.',
+            duracao=timedelta(hours=6))
+
+        self.client.login(username='nirvana', password='password')
+
+    def test_criar_ocorrencia(self):
+        data_hora_criacao = timezone.now()
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+        prazo = data_hora_criacao + self.tipo.duracao
+
+        data = {'tipo': self.tipo.id, 'data_hora_criacao': data_hora_criacao,
+                'transitavel_veiculo': transitavel_veiculo,
+                'transitavel_a_pe': transitavel_a_pe, 'descricao': descricao, 'latitude': latitude,
+                'longitude': longitude}
+
+        expected_data = {'id': 1, 'esta_ativa': True,
+                         'transitavel_veiculo': transitavel_veiculo,
+                         'transitavel_a_pe': transitavel_a_pe, 'quantidade_existente': 1,
+                         'quantidade_inexistente': 0, 'quantidade_caso_encerrado': 0,
+                         'usuario': 1, 'latitude': latitude,
+                         'longitude': longitude,
+                         'descricao': descricao, 'tipo': self.tipo.id, }
+
+        request = self.client.post('/api/ocorrencias/', data=data)
+
+        respose_data = request.data
+        del respose_data['prazo_termino']
+        del respose_data['data_hora_criacao']
+
+        self.assertEqual(request.status_code, status.HTTP_201_CREATED)
+        self.assertJSONEqual(json.dumps(respose_data), json.dumps(expected_data))

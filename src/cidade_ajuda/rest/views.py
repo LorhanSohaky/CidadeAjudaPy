@@ -1,5 +1,7 @@
 from django.http import JsonResponse
 from rest_framework import viewsets, status
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario
 from cidade_ajuda.rest.serializers import TipoSerializer, OcorrenciaSerializer, UsuarioSerializer
@@ -34,5 +36,16 @@ class OcorrenciaViewSet(viewsets.ModelViewSet):
     queryset = Ocorrencia.objects.all()
     serializer_class = OcorrenciaSerializer
 
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+
     def perform_create(self, serializer):
-        serializer.save(usuario=self.request.usuario)
+        try:
+            usuario = Usuario.objects.get(user=self.request.user)
+            serializer.save(usuario=usuario)
+        except Usuario.DoesNotExist:
+            raise PermissionDenied(detail='Precisa ser do tipo usuário')
