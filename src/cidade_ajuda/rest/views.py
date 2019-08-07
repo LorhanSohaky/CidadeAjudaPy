@@ -16,7 +16,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     serializer_class = UsuarioSerializer
 
     def get_permissions(self):
-        print(self.request.user)
         if self.action in ['create', ]:
             permission_classes = [permissions.AllowAny]
         elif self.action in ['update', 'partial_update', 'destroy', ]:
