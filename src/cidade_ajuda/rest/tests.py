@@ -173,8 +173,7 @@ class OcorrenciaTest(APITestCase):
         longitude = -30
         prazo = data_hora_criacao + self.tipo.duracao
 
-        data = {'tipo': self.tipo.id, 'data_hora_criacao': data_hora_criacao,
-                'transitavel_veiculo': transitavel_veiculo,
+        data = {'tipo': self.tipo.id, 'transitavel_veiculo': transitavel_veiculo,
                 'transitavel_a_pe': transitavel_a_pe, 'descricao': descricao, 'latitude': latitude,
                 'longitude': longitude}
 

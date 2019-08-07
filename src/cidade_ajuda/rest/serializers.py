@@ -20,7 +20,7 @@ class OcorrenciaSerializer(serializers.ModelSerializer):
     quantidade_existente = serializers.IntegerField(read_only=True)
     quantidade_inexistente = serializers.IntegerField(read_only=True)
     quantidade_caso_encerrado = serializers.IntegerField(read_only=True)
-    data_hora_criacao = serializers.DateTimeField()
+    data_hora_criacao = serializers.DateTimeField(read_only=True)
     usuario = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:

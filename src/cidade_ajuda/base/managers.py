@@ -41,15 +41,12 @@ class UsuarioManager(models.Manager):
 
 
 class OcorrenciaManager(models.Manager):
-    def create(self, usuario=None, tipo=None, data_hora_criacao=None, transitavel_veiculo=True, transitavel_a_pe=True,
+    def create(self, usuario=None, tipo=None, transitavel_veiculo=True, transitavel_a_pe=True,
                descricao=None, latitude=None, longitude=None):
         if not usuario:
             raise ValueError('Ocorrencia precisa ter um Usuario')
         if not tipo or tipo.__class__.__name__ != 'Tipo':
             raise ValueError('Ocorrencia precisa ter um Tipo')
-        if not data_hora_criacao:
-            raise ValueError(
-                'Ocorrencia precisa ter uma data e hora de criacao')
         if not latitude:
             raise ValueError('Ocorrencia precisa ter uma latitude')
         if not longitude:
@@ -63,7 +60,8 @@ class OcorrenciaManager(models.Manager):
         quantidade_existente = 1
         quantidade_inexistente = 0
         quantidade_caso_encerrado = 0
-        prazo_termino = timezone.now() + tipo.duracao
+        data_hora_criacao = timezone.now()
+        prazo_termino = data_hora_criacao + tipo.duracao
 
         ocorrencia = self.model(usuario=usuario, tipo=tipo, esta_ativa=esta_ativa, data_hora_criacao=data_hora_criacao,
                                 transitavel_veiculo=transitavel_veiculo,
