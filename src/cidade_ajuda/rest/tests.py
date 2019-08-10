@@ -153,7 +153,7 @@ class OcorrenciaTest(APITestCase):
                          'quantidade_inexistente': 0, 'quantidade_caso_encerrado': 0,
                          'usuario': 1, 'latitude': latitude,
                          'longitude': longitude,
-                         'descricao': descricao, 'tipo': self.tipo.id, }
+                         'descricao': descricao, 'tipo': self.tipo.id, 'imagens': []}
 
         request = self.client.post('/api/ocorrencias/', data=data)
 
