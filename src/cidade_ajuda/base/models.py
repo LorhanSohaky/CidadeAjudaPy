@@ -34,7 +34,7 @@ class Tipo(models.Model):
 
 class Ocorrencia(models.Model):
     usuario = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, verbose_name=_('Usuário'))
+        Usuario, on_delete=models.PROTECT, verbose_name=_('Usuário'), related_name='ocorrencias')
     tipo = models.ForeignKey(
         Tipo, on_delete=models.PROTECT, verbose_name=_('Tipo'))
     latitude = models.FloatField(
@@ -95,7 +95,7 @@ class Comentario(models.Model):
 
 class ImagemOcorrencia(models.Model):
     ocorrencia = models.ForeignKey(
-        Ocorrencia, on_delete=models.PROTECT, verbose_name=_('Ocorrência'))
+        Ocorrencia, on_delete=models.PROTECT, verbose_name=_('Ocorrência'), related_name='imagens')
     imagem = models.ImageField(verbose_name=_(
         'Imagem'), upload_to='ocorrencias')
 
