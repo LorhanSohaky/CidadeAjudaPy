@@ -28,6 +28,7 @@ class OcorrenciaSerializer(serializers.ModelSerializer):
     quantidade_inexistente = serializers.IntegerField(read_only=True)
     quantidade_caso_encerrado = serializers.IntegerField(read_only=True)
     data_hora_criacao = serializers.DateTimeField(read_only=True)
+    descricao = serializers.CharField(required=True)
     usuario = serializers.PrimaryKeyRelatedField(read_only=True)
     imagens = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                   view_name='imagemocorrencia-detail')
