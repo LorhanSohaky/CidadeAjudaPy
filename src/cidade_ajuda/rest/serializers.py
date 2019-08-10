@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario
+from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia
 
 
 class TipoSerializer(serializers.ModelSerializer):
@@ -10,6 +10,13 @@ class TipoSerializer(serializers.ModelSerializer):
         ordering = '-id'
         fields = '__all__'
         read_only = ['id']
+
+
+class ImagemOcorrenciaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImagemOcorrencia
+        ordering = ['-id']
+        fields = '__all__'
 
 
 class OcorrenciaSerializer(serializers.ModelSerializer):
@@ -22,11 +29,17 @@ class OcorrenciaSerializer(serializers.ModelSerializer):
     quantidade_caso_encerrado = serializers.IntegerField(read_only=True)
     data_hora_criacao = serializers.DateTimeField(read_only=True)
     usuario = serializers.PrimaryKeyRelatedField(read_only=True)
+    imagens = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+                                                  view_name='imagemocorrencia-detail')
 
     class Meta:
         model = Ocorrencia
         ordering = '-id'
-        fields = '__all__'
+        fields = ['id', 'esta_ativa', 'prazo_termino', 'transitavel_veiculo', 'transitavel_a_pe',
+                  'quantidade_existente',
+                  'quantidade_inexistente', 'quantidade_caso_encerrado', 'data_hora_criacao', 'usuario', 'latitude',
+                  'longitude', 'tipo', 'descricao',
+                  'imagens']
 
     def create(self, validated_data):
         message_obj = super().create(validated_data)
