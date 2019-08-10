@@ -230,3 +230,18 @@ class OcorrenciaTest(APITestCase):
         request = self.client.post('/api/ocorrencias/', data=data)
 
         self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_criar_ocorrencia_sem_estar_logado(self):
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de alguém não logado'
+        latitude = -10
+        longitude = -50
+
+        data = {'tipo': self.tipo.id, 'transitavel_veiculo': transitavel_veiculo,
+                'transitavel_a_pe': transitavel_a_pe, 'descricao': descricao, 'latitude': latitude,
+                'longitude': longitude}
+
+        request = APIClient().post('/api/ocorrencias/', data=data)
+
+        self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)
