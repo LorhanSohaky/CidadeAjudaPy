@@ -1,9 +1,10 @@
 from django.http import JsonResponse
+from rest_framework import exceptions
 from rest_framework import viewsets, permissions
-from rest_framework.exceptions import PermissionDenied
 
-from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario
-from cidade_ajuda.rest.serializers import TipoSerializer, OcorrenciaSerializer, UsuarioSerializer
+from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia
+from cidade_ajuda.rest.serializers import TipoSerializer, OcorrenciaSerializer, UsuarioSerializer, \
+    ImagemOcorrenciaSerializer
 
 
 class TipoViewSet(viewsets.ModelViewSet):
@@ -37,7 +38,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             serializer.save()
             return JsonResponse(data=serializer.data)
         else:
-            raise PermissionDenied(detail='somente o proprio usuario pode alterar seus dados')
+            raise exceptions.PermissionDenied(detail='somente o proprio usuario pode alterar seus dados')
 
 
 class OcorrenciaViewSet(viewsets.ModelViewSet):
@@ -51,4 +52,22 @@ class OcorrenciaViewSet(viewsets.ModelViewSet):
             usuario = Usuario.objects.get(user=self.request.user)
             serializer.save(usuario=usuario)
         except Usuario.DoesNotExist:
-            raise PermissionDenied(detail='Precisa ser do tipo usuário')
+            raise exceptions.PermissionDenied(detail='Precisa ser do tipo usuário')
+
+
+class ImagemOcorrenciaViewSet(viewsets.ModelViewSet):
+    queryset = ImagemOcorrencia.objects.all()
+    serializer_class = ImagemOcorrenciaSerializer
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        try:
+            ocorrencia = Ocorrencia.objects.get(id=self.request.data['ocorrencia'])
+
+            if ocorrencia.usuario.user.username != str(self.request.user):
+                raise exceptions.PermissionDenied('Somente o criador da ocorrência pode enviar imagens')
+
+            serializer.save()
+        except Ocorrencia.DoesNotExist:
+            raise exceptions.PermissionDenied(detail='Ocorrência não existe')
