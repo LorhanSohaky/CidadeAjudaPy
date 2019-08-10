@@ -163,3 +163,70 @@ class OcorrenciaTest(APITestCase):
 
         self.assertEqual(request.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(json.dumps(respose_data), json.dumps(expected_data))
+
+    def test_criar_ocorrencia_sem_transitavel_veiculo(self):
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+        longitude = -30
+
+        data = {'tipo': self.tipo.id, 'transitavel_a_pe': transitavel_a_pe, 'descricao': descricao,
+                'latitude': latitude,
+                'longitude': longitude}
+
+        expected_data = {'id': 1, 'esta_ativa': True,
+                         'transitavel_veiculo': False,
+                         'transitavel_a_pe': transitavel_a_pe, 'quantidade_existente': 1,
+                         'quantidade_inexistente': 0, 'quantidade_caso_encerrado': 0,
+                         'usuario': 1, 'latitude': latitude,
+                         'longitude': longitude,
+                         'descricao': descricao, 'tipo': self.tipo.id, 'imagens': []}
+
+        request = self.client.post('/api/ocorrencias/', data=data)
+
+        respose_data = request.data
+        del respose_data['prazo_termino']
+        del respose_data['data_hora_criacao']
+
+        self.assertEqual(request.status_code, status.HTTP_201_CREATED)
+        self.assertJSONEqual(json.dumps(respose_data), json.dumps(expected_data))
+
+    def test_criar_ocorrencia_sem_descricao(self):
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        latitude = -30
+        longitude = -30
+
+        data = {'tipo': self.tipo.id, 'transitavel_veiculo': transitavel_veiculo,
+                'transitavel_a_pe': transitavel_a_pe, 'latitude': latitude,
+                'longitude': longitude}
+
+        request = self.client.post('/api/ocorrencias/', data=data)
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_criar_ocorrencia_sem_latitude(self):
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        longitude = -30
+
+        data = {'tipo': self.tipo.id, 'transitavel_veiculo': transitavel_veiculo,
+                'transitavel_a_pe': transitavel_a_pe, 'descricao': descricao, 'longitude': longitude}
+
+        request = self.client.post('/api/ocorrencias/', data=data)
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_criar_ocorrencia_sem_longitude(self):
+        transitavel_veiculo = True
+        transitavel_a_pe = False
+        descricao = 'descrição de teste'
+        latitude = -30
+
+        data = {'tipo': self.tipo.id, 'transitavel_veiculo': transitavel_veiculo,
+                'transitavel_a_pe': transitavel_a_pe, 'descricao': descricao, 'latitude': latitude}
+
+        request = self.client.post('/api/ocorrencias/', data=data)
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
