@@ -101,5 +101,5 @@ class ImagemComentarioViewSet(viewsets.ModelViewSet):
                 raise exceptions.PermissionDenied('Somente o criador do comentário pode enviar imagens')
 
             serializer.save()
-        except Ocorrencia.DoesNotExist:
-            raise exceptions.PermissionDenied(detail='Ocorrência não existe')
+        except Comentario.DoesNotExist:
+            raise exceptions.PermissionDenied(detail='Comentário não existe')
