@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia
+from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia, Comentario
 
 
 class TipoSerializer(serializers.ModelSerializer):
@@ -87,3 +87,15 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class ComentarioSerializer(serializers.ModelSerializer):
+    texto = serializers.CharField()
+    data_hora = serializers.DateTimeField(read_only=True)
+    usuario = serializers.PrimaryKeyRelatedField(read_only=True)
+    ocorrencia = serializers.PrimaryKeyRelatedField(queryset=Ocorrencia.objects.all())
+
+    class Meta:
+        model = Comentario
+        ordering = ['-id']
+        fields = ['id', 'texto', 'data_hora', 'usuario', 'ocorrencia']

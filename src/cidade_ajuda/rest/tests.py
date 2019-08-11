@@ -315,4 +315,60 @@ class ImagemOcorrenciaTest(APITestCase):
 
         request = self.client.post('/api/imagens-ocorrencias/', data=data, format='multipart')
 
-        self.assertEqual(request.status_code,status.HTTP_403_FORBIDDEN)
+        self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ComentarioTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.usuario = Usuario.objects.create(
+            primeiro_nome='Ryan', sobrenome='Oliveira', apelido='ryan', data_nascimento=date(1991, 6, 15),
+            email='ryan@mail.com', password='password')
+
+        self.tipo = Tipo.objects.create(
+            titulo='Alagamento',
+            sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há '
+                               'risco de contágio de doenças, entre outras informações.',
+            duracao=timedelta(hours=6))
+
+        self.ocorrencia = Ocorrencia.objects.create(usuario=self.usuario, tipo=self.tipo, transitavel_veiculo=True,
+                                                    transitavel_a_pe=True, descricao='descrição de exemplo',
+                                                    latitude=30, longitude=50)
+        self.client.login(username='ryan', password='password')
+
+    def test_criar_comentario(self):
+        data = {'texto': 'O transito esta todo parada', 'ocorrencia': self.ocorrencia.pk}
+
+        expected_data = {'id': 1, 'texto': 'O transito esta todo parada', 'usuario': self.usuario.pk,
+                         'ocorrencia': self.ocorrencia.pk}
+
+        request = self.client.post('/api/comentarios/', data=data)
+
+        response_data = request.data
+
+        del response_data['data_hora']
+
+        self.assertEqual(request.status_code, status.HTTP_201_CREATED)
+        self.assertJSONEqual(json.dumps(response_data), json.dumps(expected_data))
+
+    def test_criar_comentario_sem_estar_logado(self):
+        data = {'texto': 'O transito está todo parada', 'ocorrencia': self.ocorrencia}
+
+        request = APIClient().post('/api/comentarios/', data=data)
+
+        self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_criar_comentario_sem_texto(self):
+        data = {'ocorrencia': self.ocorrencia}
+
+        request = self.client.post('/api/comentarios/', data=data)
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_criar_comentario_sem_ocorrencia(self):
+        data = {'texto': 'O transito está todo parada'}
+
+        request = self.client.post('/api/comentarios/', data=data)
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)

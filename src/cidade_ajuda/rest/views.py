@@ -2,9 +2,9 @@ from django.http import JsonResponse
 from rest_framework import exceptions
 from rest_framework import viewsets, permissions
 
-from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia
+from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia, Comentario
 from cidade_ajuda.rest.serializers import TipoSerializer, OcorrenciaSerializer, UsuarioSerializer, \
-    ImagemOcorrenciaSerializer
+    ImagemOcorrenciaSerializer, ComentarioSerializer
 
 
 class TipoViewSet(viewsets.ModelViewSet):
@@ -71,3 +71,17 @@ class ImagemOcorrenciaViewSet(viewsets.ModelViewSet):
             serializer.save()
         except Ocorrencia.DoesNotExist:
             raise exceptions.PermissionDenied(detail='Ocorrência não existe')
+
+
+class ComentarioViewSet(viewsets.ModelViewSet):
+    queryset = Comentario.objects.all().order_by('id')
+    serializer_class = ComentarioSerializer
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        try:
+            usuario = Usuario.objects.get(user=self.request.user)
+            serializer.save(usuario=usuario)
+        except Usuario.DoesNotExist:
+            raise exceptions.PermissionDenied(detail='Precisa ser do tipo usuário')
