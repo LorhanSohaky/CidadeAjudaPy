@@ -84,7 +84,7 @@ class Interacao(models.Model):
 
 
 class Comentario(models.Model):
-    texto = models.TextField(verbose_name=_('Comentário'))
+    texto = models.TextField(verbose_name=_('Comentário'), blank=True)
     data_hora = models.DateTimeField(
         auto_now_add=True, verbose_name=_('data de hora do envio'))
     usuario = models.ForeignKey(
