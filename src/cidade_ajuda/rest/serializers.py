@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia, Comentario
+from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia, Comentario, ImagemComentario
 
 
 class TipoSerializer(serializers.ModelSerializer):
@@ -99,3 +99,10 @@ class ComentarioSerializer(serializers.ModelSerializer):
         model = Comentario
         ordering = ['-id']
         fields = ['id', 'texto', 'data_hora', 'usuario', 'ocorrencia']
+
+
+class ImagemComentarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImagemComentario
+        ordering = ['-id']
+        fields = '__all__'

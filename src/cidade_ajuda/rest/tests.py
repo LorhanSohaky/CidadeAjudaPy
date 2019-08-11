@@ -6,7 +6,7 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from cidade_ajuda.base.models import Usuario, Tipo, Ocorrencia
+from cidade_ajuda.base.models import Usuario, Tipo, Ocorrencia, Comentario
 
 
 class UsuarioTest(APITestCase):
@@ -372,3 +372,71 @@ class ComentarioTest(APITestCase):
         request = self.client.post('/api/comentarios/', data=data)
 
         self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class ImagemComentarioTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.usuario = Usuario.objects.create(
+            primeiro_nome='Otávio', sobrenome='Queiroz', apelido='otavio', data_nascimento=date(1993, 6, 15),
+            email='otavio@mail.com', password='password')
+
+        usuario2 = Usuario.objects.create(
+            primeiro_nome='André', sobrenome='Santos', apelido='andre', data_nascimento=date(1993, 6, 15),
+            email='andre@mail.com', password='password')
+
+        self.tipo = Tipo.objects.create(
+            titulo='Alagamento',
+            sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há '
+                               'risco de contágio de doenças, entre outras informações.',
+            duracao=timedelta(hours=6))
+
+        self.ocorrencia = Ocorrencia.objects.create(usuario=self.usuario, tipo=self.tipo, transitavel_veiculo=True,
+                                                    transitavel_a_pe=True, descricao='descrição de exemplo',
+                                                    latitude=30, longitude=50)
+
+        self.comentario = Comentario.objects.create(usuario=self.usuario, ocorrencia=self.ocorrencia)
+        self.comentario2 = Comentario.objects.create(usuario=usuario2, ocorrencia=self.ocorrencia)
+
+        tmp_image = Image.new('RGB', (100, 100))
+        self.image = tempfile.NamedTemporaryFile(suffix='.jpg')
+        tmp_image.save(self.image)
+        self.image.seek(0)
+
+        self.client.login(username='otavio', password='password')
+
+    def test_enviar_imagem_do_comentario(self):
+        data = {'imagem': self.image, 'comentario': self.comentario.pk}
+
+        request = self.client.post('/api/imagens-comentarios/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_201_CREATED)
+
+    def test_enviar_imagem_do_comentario_sem_estar_logado(self):
+        data = {'imagem': self.image, 'comentario': self.comentario.pk}
+
+        request = APIClient().post('/api/imagens-comentarios/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_enviar_imagem_do_comentario_inexistente(self):
+        data = {'imagem': self.image, 'comentario': 10}
+
+        request = self.client.post('/api/imagens-comentarios/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_enviar_imagem_do_comentario_sem_imagem(self):
+        data = {'comentario': self.comentario.pk}
+
+        request = self.client.post('/api/imagens-comentarios/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_enviar_imagem_do_comentario_de_outro_usuario(self):
+        data = {'imagem': self.image, 'comentario': 2}
+
+        request = self.client.post('/api/imagens-comentarios/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)

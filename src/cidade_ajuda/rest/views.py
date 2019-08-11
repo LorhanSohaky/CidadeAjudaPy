@@ -2,9 +2,9 @@ from django.http import JsonResponse
 from rest_framework import exceptions
 from rest_framework import viewsets, permissions
 
-from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia, Comentario
+from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia, Comentario, ImagemComentario
 from cidade_ajuda.rest.serializers import TipoSerializer, OcorrenciaSerializer, UsuarioSerializer, \
-    ImagemOcorrenciaSerializer, ComentarioSerializer
+    ImagemOcorrenciaSerializer, ComentarioSerializer, ImagemComentarioSerializer
 
 
 class TipoViewSet(viewsets.ModelViewSet):
@@ -85,3 +85,21 @@ class ComentarioViewSet(viewsets.ModelViewSet):
             serializer.save(usuario=usuario)
         except Usuario.DoesNotExist:
             raise exceptions.PermissionDenied(detail='Precisa ser do tipo usuário')
+
+
+class ImagemComentarioViewSet(viewsets.ModelViewSet):
+    queryset = ImagemComentario.objects.all()
+    serializer_class = ImagemComentarioSerializer
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        try:
+            comentario = Comentario.objects.get(id=self.request.data['comentario'])
+
+            if comentario.usuario.user.username != str(self.request.user):
+                raise exceptions.PermissionDenied('Somente o criador do comentário pode enviar imagens')
+
+            serializer.save()
+        except Ocorrencia.DoesNotExist:
+            raise exceptions.PermissionDenied(detail='Ocorrência não existe')
