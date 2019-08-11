@@ -1,10 +1,12 @@
 import json
+import tempfile
 from datetime import date, timedelta
 
+from PIL import Image
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from cidade_ajuda.base.models import Usuario, Tipo
+from cidade_ajuda.base.models import Usuario, Tipo, Ocorrencia
 
 
 class UsuarioTest(APITestCase):
@@ -245,3 +247,72 @@ class OcorrenciaTest(APITestCase):
         request = APIClient().post('/api/ocorrencias/', data=data)
 
         self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ImagemOcorrenciaTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.usuario = Usuario.objects.create(
+            primeiro_nome='Igor', sobrenome='Santos', apelido='nivaldo', data_nascimento=date(1993, 6, 15),
+            email='igor@mail.com', password='password')
+
+        usuario2 = Usuario.objects.create(
+            primeiro_nome='Lucas', sobrenome='Santos', apelido='lucas', data_nascimento=date(1993, 6, 15),
+            email='lucas@mail.com', password='password')
+
+        self.tipo = Tipo.objects.create(
+            titulo='Alagamento',
+            sugestao_descricao='Você pode falar sobre o tamanho dele, se há correnteza, se há risco de morte, se há '
+                               'risco de contágio de doenças, entre outras informações.',
+            duracao=timedelta(hours=6))
+
+        self.ocorrencia = Ocorrencia.objects.create(usuario=self.usuario, tipo=self.tipo, transitavel_veiculo=True,
+                                                    transitavel_a_pe=True, descricao='descrição de exemplo',
+                                                    latitude=30, longitude=50)
+
+        self.ocorrencia2 = Ocorrencia.objects.create(usuario=usuario2, tipo=self.tipo, transitavel_veiculo=True,
+                                                     transitavel_a_pe=True, descricao='descrição de exemplo',
+                                                     latitude=30, longitude=50)
+
+        tmp_image = Image.new('RGB', (100, 100))
+        self.image = tempfile.NamedTemporaryFile(suffix='.jpg')
+        tmp_image.save(self.image)
+        self.image.seek(0)
+
+        self.client.login(username='nivaldo', password='password')
+
+    def test_enviar_imagem_da_ocorrencia(self):
+        data = {'imagem': self.image, 'ocorrencia': self.ocorrencia.pk}
+
+        request = self.client.post('/api/imagens-ocorrencias/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_201_CREATED)
+
+    def test_enviar_imagem_da_ocorrencia_sem_estar_logado(self):
+        data = {'imagem': self.image, 'ocorrencia': self.ocorrencia.pk}
+
+        request = APIClient().post('/api/imagens-ocorrencias/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_enviar_imagem_da_ocorrencia_inexistente(self):
+        data = {'imagem': self.image, 'ocorrencia': 10}
+
+        request = self.client.post('/api/imagens-ocorrencias/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_enviar_imagem_da_ocorrencia_sem_imagem(self):
+        data = {'ocorrencia': self.ocorrencia.pk}
+
+        request = self.client.post('/api/imagens-ocorrencias/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_enviar_imagem_da_ocorrencia_de_outro_usuario(self):
+        data = {'imagem': self.image, 'ocorrencia': 2}
+
+        request = self.client.post('/api/imagens-ocorrencias/', data=data, format='multipart')
+
+        self.assertEqual(request.status_code,status.HTTP_403_FORBIDDEN)
