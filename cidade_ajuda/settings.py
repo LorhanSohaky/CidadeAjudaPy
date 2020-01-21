@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'cidade_ajuda.base',
     'cidade_ajuda.rest',
-    'cidade_ajuda.frontend',
 ]
 
 MIDDLEWARE = [

@@ -9,9 +9,8 @@ international_urls = i18n_patterns(
 )
 
 rest_url = [path('api/', include('cidade_ajuda.rest.urls')), path('api-auth/', include('rest_framework.urls')), ]
-front_url = [path('', include('cidade_ajuda.frontend.urls')), ]
 
-static_urls = static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \
-              static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+#static_urls = static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \
+#              static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-urlpatterns = international_urls + rest_url + static_urls + front_url
+urlpatterns = international_urls + rest_url
