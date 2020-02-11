@@ -28,7 +28,8 @@ class UsuarioManager(models.Manager):
                                                      (data_nascimento.month, data_nascimento.day))
 
         if not idade > self.IDADE_MINIMA:
-            raise ValueError('User must be at least {} years old'.format(self.IDADE_MINIMA))
+            raise ValueError(
+                'User must be at least {} years old'.format(self.IDADE_MINIMA))
 
         user = User.objects.create(first_name=primeiro_nome, last_name=sobrenome, email=email, username=apelido,
                                    password=make_password(password),
@@ -74,4 +75,4 @@ class OcorrenciaManager(models.Manager):
         return ocorrencia
 
     def all(self):
-        return super().all()
+        return super().all().order_by('id')
