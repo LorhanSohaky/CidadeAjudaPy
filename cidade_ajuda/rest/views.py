@@ -68,6 +68,17 @@ class OcorrenciaViewSet(viewsets.ModelViewSet):
             raise exceptions.PermissionDenied(
                 detail='Precisa ser do tipo usuário')
 
+    def get_queryset(self):
+        if self.request.query_params:
+            southWest = self.request.GET.getlist('southWest')
+            northEast = self.request.GET.getlist('northEast')
+            if southWest and northEast:
+                southWest = [float(i) for i in southWest]
+                northEast = [float(i) for i in northEast]
+                return self.queryset.filter(latitude__gte=southWest[0], longitude__gte=southWest[1], latitude__lte=northEast[0], longitude__lte=northEast[1])
+            raise exceptions.ParseError('Required southWest and northEast')
+        return self.queryset
+
 
 class ImagemOcorrenciaViewSet(viewsets.ModelViewSet):
     queryset = ImagemOcorrencia.objects.all()
