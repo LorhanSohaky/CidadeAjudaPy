@@ -70,8 +70,8 @@ class OcorrenciaViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.query_params:
-            southWest = self.request.GET.getlist('southWest')
-            northEast = self.request.GET.getlist('northEast')
+            southWest = self.request.GET.getlist('southWest[]')
+            northEast = self.request.GET.getlist('northEast[]')
             if southWest and northEast:
                 southWest = [float(i) for i in southWest]
                 northEast = [float(i) for i in northEast]
