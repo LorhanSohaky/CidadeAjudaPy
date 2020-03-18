@@ -20,6 +20,7 @@ AUTH_USER_MODEL = 'auth.User'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django.contrib.gis',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
