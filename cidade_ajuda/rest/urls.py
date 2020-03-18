@@ -13,4 +13,5 @@ router.register(r'imagens-comentarios', views.ImagemComentarioViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('relatorio/<int:place_id>', views.report),
 ]

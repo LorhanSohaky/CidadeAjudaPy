@@ -1,8 +1,10 @@
+import requests
+from django.contrib.gis.geos import Point, Polygon
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import exceptions
 from rest_framework import viewsets, permissions
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 
 from cidade_ajuda.base.models import Tipo, Ocorrencia, Usuario, ImagemOcorrencia, Comentario, ImagemComentario
 from cidade_ajuda.rest.serializers import TipoSerializer, OcorrenciaSerializer, UsuarioSerializer, \
@@ -133,3 +135,23 @@ class ImagemComentarioViewSet(viewsets.ModelViewSet):
             serializer.save()
         except Comentario.DoesNotExist:
             raise exceptions.PermissionDenied(detail='Comentário não existe')
+
+@api_view(['GET'])
+def report(request,place_id):
+    response = requests.get('https://nominatim.openstreetmap.org/details.php?place_id={}&format=json&polygon_geojson=1'.format(place_id))
+    data = response.json()
+
+    if not data['geometry']['type'] == 'Polygon':
+        raise exceptions.ParseError('Invalid place id')
+    
+    points = tuple([(i[0],i[1]) for i in data['geometry']['coordinates'][0]])
+    polygon = Polygon(points)
+
+    ocorrencias = []
+    for ocorrencia in Ocorrencia.objects.all():
+        ponto = Point(ocorrencia.longitude, ocorrencia.latitude)
+        if polygon.contains(ponto):
+            ocorrencias.append(ocorrencia)
+
+    serializer = OcorrenciaSerializer(ocorrencias, many=True)
+    return Response(serializer.data)
